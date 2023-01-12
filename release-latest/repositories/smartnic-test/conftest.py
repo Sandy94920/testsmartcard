@@ -54,16 +54,14 @@ def test_bed(request: 'FixtureRequest') -> Generator[TestBed, Any, None]:
 
 
 @pytest.fixture(scope="session")
-def ctrl_wrap(request: 'FixtureRequest'
-              ) -> Generator[ControllerWrapper, Any, None]:
+def ctrl_wrap(request: 'FixtureRequest') -> Generator[ControllerWrapper, Any, None]:
     LOGGER.info("ControllerWrapper initializing")
     config = get_config()
     yield ControllerWrapper(config)
 
 
 @pytest.fixture()
-def global_config(request: 'FixtureRequest'
-                  ) -> Generator[GlobalConfigHandler, Any, None]:
+def global_config(request: 'FixtureRequest') -> Generator[GlobalConfigHandler, Any, None]:
     LOGGER.info("Accessing Global Config")
     yield GlobalConfigHandler(get_config())
 
