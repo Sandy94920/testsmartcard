@@ -1,0 +1,72 @@
+---
+topology: vm_vm
+groups:
+  cmp:
+    ssh_user: centos
+    ssh_key: ~/.ssh/key_rsa_2048_m
+    passw: centos
+  vm:
+    ssh_user: centos
+    passw: centos
+compute:
+  e2e-cpt1:
+    ip_mgmt:  10.161.8.20
+    intel_pac_phy_addr_pci: "0000:b2:00.0"
+    group: cmp
+    vms:
+      vm1:
+        ip_mgmt: '192.168.137.121'
+        ip_data_plane: '192.168.100.101'
+        mac_data_plane: '54:52:00:00:01:01'
+        second_iface: 'eth2'
+        iface: 'eth1'
+        group: 'vm'
+      vm2:
+        ip_mgmt: '192.168.137.127'
+        ip_data_plane: '192.168.100.102'
+        mac_data_plane: '54:52:00:00:01:02'
+        second_iface: 'eth2'
+        iface: 'eth1'
+        group: 'vm'
+      vm3:
+        ip_mgmt: '192.168.137.128'
+        ip_data_plane: '192.168.100.103'
+        mac_data_plane: '54:52:00:01:01:03'
+        iface: 'eth1'
+        second_iface: 'eth2'
+        group: 'vm'
+  e2e-cpt2:
+    ip_mgmt: 10.161.8.224
+    intel_pac_phy_addr_pci: "0000:b2:00.0"
+    group: cmp
+    vms:
+      vm4:
+        ip_mgmt: '192.168.137.117'
+        ip_data_plane: '192.168.100.104'
+        mac_data_plane: '54:52:00:00:02:01'
+        iface: 'eth1'
+        second_iface: 'eth2'
+        group: 'vm'
+      vm5:
+        ip_mgmt: '192.168.137.122'
+        ip_data_plane: '192.168.100.105'
+        mac_data_plane: '54:52:00:00:02:02'
+        iface: 'eth1'
+        second_iface: 'eth2'
+        group: 'vm'
+      vm6:
+        ip_mgmt: '192.168.137.126'
+        ip_data_plane: '192.168.100.106'
+        mac_data_plane: '54:52:00:00:02:03'
+        iface: 'eth1'
+        second_iface: 'eth2'
+        group: 'vm'
+controller:
+  ip_mgmt: '10.161.8.185'
+  group: cmp
+  networks_data_plane_gateway:
+    - "192.168.100.254"
+    - "192.168.150.254"
+  data_plane_networks_names:
+    - "network-ci"
+    - "network-ci-150"

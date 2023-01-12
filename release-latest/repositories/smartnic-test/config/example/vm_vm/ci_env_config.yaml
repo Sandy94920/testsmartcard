@@ -1,0 +1,164 @@
+--
+topology: vm_vm
+docker_registry: harbor.smartnic.codilime.com/tungstenfabric
+lacp_enabled: True
+compute:
+  nic01:
+    intel_pac_phy_addr_pci: "0000:1d:00.0"
+    ip_mgmt: "10.7.0.241"
+    ssh_user: "centos"
+    ssh_key: "~/.ssh/key_rsa_2048_m"
+    vms:
+      vm1-1:
+        ip_mgmt: "10.7.0.81"
+        iface: "eth1"
+        mac_data_plane: "54:52:00:00:01:01"
+        ip_data_plane: "192.168.100.101"
+        second_iface: "eth2"
+        ssh_user: "centos"
+        passw: "centos"
+      vm1-2:
+        ip_mgmt: "10.7.0.82"
+        iface: "eth1"
+        mac_data_plane: "54:52:00:00:01:02"
+        ip_data_plane: "192.168.100.102"
+        second_iface: "eth2"
+        ssh_user: "centos"
+        passw: "centos"
+      vm1-3:
+        ip_mgmt: "10.7.0.83"
+        iface: "eth1"
+        mac_data_plane: "54:52:00:00:01:03"
+        ip_data_plane: "192.168.100.103"
+        second_iface: "eth2"
+        ssh_user: "centos"
+        passw: "centos"
+    cn_interfaces:
+      et-0/0/0:0: |
+        interfaces{
+            replace:
+            et-0/0/0:0 {
+                description "nic01";
+                ether-options {
+                    no-flow-control;
+                    802.3ad ae1;
+                }
+                gigether-options {
+                    fec none;
+                }
+            }
+        }
+
+      et-0/0/0:1: |
+        interfaces{
+            replace:
+            et-0/0/0:1 {
+                description "nic01";
+                ether-options {
+                    no-flow-control;
+                    802.3ad ae1;
+                }
+                gigether-options {
+                    fec none;
+                }
+            }
+        }
+
+    ae_interface:
+      ae1: |
+        interfaces {
+            replace:
+            ae1 {
+                description "nic01";
+                aggregated-ether-options {
+                    lacp {
+                        periodic fast;
+                    }
+                }
+                mtu 9216;
+                unit 0 {
+                    family ethernet-switching {
+                        interface-mode access;
+                        vlan {
+                            members vl_dataplane_ci1;
+                        }
+                    }
+                }
+            }
+        }
+
+  nic02:
+    intel_pac_phy_addr_pci: "0000:1d:00.0"
+    ip_mgmt: "10.7.0.242"
+    ssh_user: "centos"
+    ssh_key: "~/.ssh/key_rsa_2048_m"
+    vms:
+      vm2-1:
+        ip_mgmt: "10.7.0.84"
+        iface: "eth1"
+        mac_data_plane: "54:52:00:00:02:01"
+        ip_data_plane: "192.168.100.104"
+        second_iface: "eth2"
+        ssh_user: "centos"
+        passw: "centos"
+      vm2-2:
+        ip_mgmt: "10.7.0.85"
+        iface: "eth1"
+        mac_data_plane: "54:52:00:00:02:02"
+        ip_data_plane: "192.168.100.105"
+        second_iface: "eth2"
+        ssh_user: "centos"
+        passw: "centos"
+      vm2-3:
+        ip_mgmt: "10.7.0.86"
+        iface: "eth1"
+        mac_data_plane: "54:52:00:00:02:03"
+        ip_data_plane: "192.168.100.106"
+        second_iface: "eth2"
+        ssh_user: "centos"
+        passw: "centos"
+    cn_interfaces:
+      et-0/0/2:0: |
+        interfaces{
+            replace:
+            et-0/0/2:0 {
+                description "nic02";
+                ether-options {
+                    no-flow-control;
+                    802.3ad ae2;
+                }
+                gigether-options {
+                    fec none;
+                }
+            }
+        }
+
+      et-0/0/2:1: |
+        interfaces{
+            replace:
+            et-0/0/2:1 {
+                description "nic02";
+                ether-options {
+                    no-flow-control;
+                    802.3ad ae2;
+                }
+                gigether-options {
+                    fec none;
+                }
+            }
+        }
+
+controller:
+  ip_mgmt: "10.7.0.208"
+  ssh_user: "centos"
+  ssh_key: "~/.ssh/key_rsa_2048_m"
+  networks_data_plane_gateway:
+    - "192.168.100.254"
+    - "192.168.150.254"
+  data_plane_networks_names:
+    - "network"
+    - "network-150"
+qfx:
+  host: 10.5.102.100
+  user: admin
+  passwd: juniper123
