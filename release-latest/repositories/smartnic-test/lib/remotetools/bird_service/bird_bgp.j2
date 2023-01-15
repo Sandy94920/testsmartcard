@@ -1,0 +1,61 @@
+log "/etc/bird/bird.log" all;
+debug protocols all;
+
+define local_ip = {{ local_ip }};
+define contrail_ip = {{ contrail_ip }};
+define lo_ip = {{ lo_ip }};
+define local_as = {{ local_as }};
+define contrail_as = {{ contrail_as }};
+
+# router identifier, should be unique
+router id local_ip;
+
+# Tables master4 and master6 are defined by default
+ipv4 table master4;
+ipv6 table master6;
+
+# Not really a protocol, serves as a module for getting information about network
+# interfaces from the kernel
+protocol device {
+        scan time 10;
+        interface "lo" {
+                preferred lo_ip;
+        };
+};
+
+# Not really a protocol, imports direct routes from interfaces
+protocol direct {
+        ipv4;
+        ipv6;
+	interface "lo";
+};
+
+
+# Not really a protocol, synchornizes bird routing tables with kernel
+protocol kernel kernel4 {
+	ipv4 {
+		export all;
+		import all;
+	};
+};
+protocol kernel kernel6 {
+	ipv6 {
+		export all;
+		import all;
+	};
+};
+
+protocol bgp contrail {
+	local local_ip as local_as;
+	neighbor contrail_ip as contrail_as;
+	source address local_ip;
+	strict bind on;
+	ipv4 {
+		import all;
+		export all;
+	};
+	ipv6 {
+		import all;
+		export all;
+	};
+};

@@ -1,0 +1,96 @@
+ipv4 table master4;
+ipv6 table master6;
+
+protocol device {
+}
+
+
+protocol kernel kernel4 {
+   ipv4 {
+        export none;
+        import all;
+	};
+};
+
+protocol kernel kernel6 {
+   ipv6 {
+        export none;
+        import all;
+        };
+};
+
+template bgp dual_stack {
+   local as 64513;
+   ipv4 {
+	import all;
+   };
+   ipv6 {
+    import all;
+   };
+};
+
+protocol bgp mx1a from dual_stack {
+    neighbor {{ MX1a }} as {{ MX_AS }};
+    ipv4 {
+	export where proto = "statvpn4_mx_a";
+    };
+    ipv6 {
+        export where proto = "statvpn6_mx_a";
+    };
+}
+
+protocol bgp mx2a from dual_stack {
+    neighbor {{ MX2a }} as {{ MX_AS }};
+    ipv4 {
+	export where proto = "statvpn4_mx_a";
+    };
+    ipv6 {
+        export where proto = "statvpn6_mx_a";
+    };
+}
+
+protocol bgp mx1b from dual_stack {
+    neighbor {{ MX1b }} as {{ MX_AS }};
+    ipv4 {
+	export where proto = "statvpn4_mx_b";
+    };
+    ipv6 {
+        export where proto = "statvpn6_mx_b";
+    };
+}
+
+protocol bgp mx2b from dual_stack {
+    neighbor {{ MX2b }} as {{ MX_AS }};
+    ipv4 {
+	export where proto = "statvpn4_mx_b";
+    };
+    ipv6 {
+        export where proto = "statvpn6_mx_b";
+    };
+}
+
+protocol static statvpn4_mx_a {
+ ipv4;
+ route 10.11.0.0/18 via {{ TREX1_NH }};
+ route 10.21.0.0/18 via {{ TREX1_NH }};
+{% for i in range(NO_PREFIX) %}{% if i % 256 %} route 10.31.{{ i//256 }}.{{ i%256 }}/32 via {{ TREX1_NH }};
+{% endif %}{% endfor %}}
+
+protocol static statvpn6_mx_a {
+ ipv6;
+ route 10:21::/114 via {{ TREX1_NH_IPv6 }};
+{% for i in range(1, NO_PREFIX) %} route 10:31::{{ i | hex }}/128 via {{ TREX1_NH_IPv6 }};
+{% endfor %}}
+
+protocol static statvpn4_mx_b {
+ ipv4;
+ route 10.12.0.0/18 via {{ TREX2_NH }};
+ route 10.22.0.0/18 via {{ TREX2_NH }};
+{% for i in range(NO_PREFIX) %}{% if i % 256 %} route 10.32.{{ i//256 }}.{{ i%256 }}/32 via {{ TREX2_NH }};
+{% endif %}{% endfor %}}
+
+protocol static statvpn6_mx_b {
+ ipv6;
+ route 10:22::/114 via {{ TREX2_NH_IPv6 }};
+{% for i in range(1, NO_PREFIX) %} route 10:32::{{ i | hex }}/128 via {{ TREX2_NH_IPv6 }};
+{% endfor %}}

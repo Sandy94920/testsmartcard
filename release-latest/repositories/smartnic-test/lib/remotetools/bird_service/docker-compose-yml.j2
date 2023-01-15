@@ -1,0 +1,47 @@
+version: '2.3'
+
+services:
+ bird:
+  container_name: {{ container_name }}
+  image: harbor.smartnic.codilime.com/tungstenfabric/docker-alpine
+  volumes:
+    - {{ bird_config_file }}:/etc/bird.conf:Z
+  command: /usr/sbin/bird -fc /etc/bird.conf
+  cap_add:
+    - ALL
+  networks:
+     lan_trex_a:
+         ipv4_address: 172.30.1.5
+         ipv6_address: 2001:db8:0:1::5
+     lan_trex_b:
+         ipv4_address: 172.30.2.5
+         ipv6_address: 2001:db8:0:2::5
+
+
+networks:
+  lan_trex_a:
+    enable_ipv6: true
+    driver: macvlan
+    driver_opts:
+      # Set proper network connection as parent
+      parent: eno2.2100
+      com.docker.network.enable_ipv6: "true"
+    ipam:
+      config:
+        - subnet: 172.30.1.0/29
+          gateway: 172.30.1.1
+        - subnet: 2001:db8:0:1::/125
+          gateway: 2001:db8:0:1::1
+  lan_trex_b:
+    enable_ipv6: true
+    driver: macvlan
+    driver_opts:
+      # Set proper network connection as parent
+      parent: eno2.2200
+      com.docker.network.enable_ipv6: "true"
+    ipam:
+      config:
+        - subnet: 172.30.2.0/29
+          gateway: 172.30.2.1
+        - subnet: 2001:db8:0:2::/125
+          gateway: 2001:db8:0:2::1
